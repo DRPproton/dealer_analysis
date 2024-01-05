@@ -1,0 +1,31 @@
+Client,Branch,,Nombre,Estado
+1520,1,1520,Sucursal A,Yucatán
+1520,2,1520,Sucursal B,Yucatán
+1520,3,1520,Sucursal C,Yucatán
+1520,5,1520,Sucursal D,Yucatán
+1521,6,1521,Sucursal E,Yucatán
+1521,7,1521,Sucursal F,Quintana Roo
+1521,8,1521,Sucursal G,Quintana Roo
+1521,9,1521,Sucursal H,Quintana Roo
+1521,10,1521,Sucursal I,Quintana Roo
+1521,11,1521,Sucursal J,Quintana Roo
+1521,12,1521,Sucursal K,Quintana Roo
+1521,13,1521,Sucursal L,Veracruz
+1521,16,1521,Sucursal M,Veracruz
+1521,18,1521,Sucursal N,Veracruz
+1521,19,1521,Sucursal Ñ,Veracruz
+1522,20,1522,Sucursal O,Tabasco
+1522,21,1522,Sucursal P,Tabasco
+1522,22,1522,Sucursal Q,Tabasco
+1522,23,1522,Sucursal R,Tabasco
+1522,24,1522,Sucursal S,Tabasco
+1522,25,1522,Sucursal T,Puebla
+1522,26,1522,Sucursal U,Puebla
+1522,27,1522,Sucursal V,Puebla
+1522,32,1522,Sucursal W,Puebla
+1522,33,1522,Sucursal X,Puebla
+1520,34,1520,Sucursal Y,Puebla
+1520,35,1520,Sucursal Z,CDMX
+1520,36,1520,Sucursal AB,CDMX
+1520,37,1520,Sucursal AC,CDMX
+1520,38,1520,Sucursal AD,CDMX
