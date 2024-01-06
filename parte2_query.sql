@@ -1,0 +1,157 @@
+-- 1. Escribe, como elaborarías una consulta para que el resultado sean todos los registros del estado de “Yucatán” del reporte “Q1_2021”
+SELECT * 
+	FROM Q1_2021 
+	JOIN Directorio ON Q1_2021.Branch = Directorio.Branch
+	WHERE Directorio.Estado = 'Yucatán';
+	
+
+--------------------------------------------------------------------------------------------------------------------------------------
+-- 2. Escribe, como elaborarías una consulta para que el resultado sea la suma del campo Venta$ visto por mes de forma consolidada.
+SELECT 
+	SUBSTR(FechaFactura, 7, 4) || '-' || SUBSTR(FechaFactura, 4, 2) AS Mes, SUM(Venta$) AS TotalVentas 
+	FROM Q1_2021 GROUP BY Mes;
+
+
+--------------------------------------------------------------------------------------------------------------------------------------	
+-- 3. Escribe, como elaborarías una consulta para que el resultado sea la Venta de Partes por Estado y marca en cada uno de los meses.
+SELECT 
+		SUBSTR(FechaFactura, 7, 4) || '-' || SUBSTR(FechaFactura, 4, 2) AS Mes, 
+		Directorio.Estado, 
+		Q1_2021.Marca,
+		SUM(VentaPartes$) AS TotalVentasPartes
+	FROM Q1_2021 
+		JOIN Directorio ON Q1_2021.Branch = Directorio.Branch 
+	GROUP BY Mes, Directorio.Estado, Q1_2021.Marca
+	ORDER By Mes, Estado, TotalVentasPartes DESC;
+
+
+--------------------------------------------------------------------------------------------------------------------------------------
+-- 4. Escribe como elaborarías una consulta para que, en cada registro, junto al campo de Venta$, tener la siguiente información de forma adicional: 
+	-- A) un campo que muestre la venta promedio por Estado (según el estado al que pertenezca la sucursal) y 
+	-- B) un campo que señale a la Sucursal (según el estado al que pertenezca la sucursal) con Mayor cantidad de VentasNetas.
+	
+-- Promedio de Venta por Estado
+SELECT d.Estado, AVG(Q1.Venta$) AS PromedioVentaPorEstado
+	FROM
+		Q1_2021 AS Q1
+	JOIN
+		Directorio AS d ON Q1.Branch = d.Branch
+	GROUP BY
+		d.Estado;
+-- Identificar la Sucursal con Mayor VentasNetas por Estado
+SELECT d.Estado, Q1.Branch, SUM(Q1.VentasNetas) AS TotalVentasNetas
+	FROM
+		Q1_2021 AS Q1
+	JOIN
+		Directorio AS d ON Q1.Branch = d.Branch
+	GROUP BY
+		d.Estado, Q1.Branch
+	ORDER BY
+		d.Estado, TotalVentasNetas DESC;
+
+-- Todo unido
+SELECT
+    Q1.IdRegistro,
+    Q1.Venta$,
+    d.Estado,
+    Q1.Branch,
+    -- Subconsulta para Venta Promedio por Estado
+    (SELECT AVG(sub_v.Venta$)
+     FROM Q1_2021 AS sub_v
+     JOIN Directorio AS sub_d ON sub_v.Branch = sub_d.Branch
+     WHERE sub_d.Estado = d.Estado) AS PromedioVentaPorEstado,
+    -- Subconsulta para Sucursal con Mayor VentasNetas por Estado
+    (SELECT sub_v.Branch
+     FROM Q1_2021 AS sub_v
+     JOIN Directorio AS sub_d ON sub_v.Branch = sub_d.Branch
+     GROUP BY sub_d.Estado, sub_v.Branch
+     ORDER BY sub_d.Estado, SUM(sub_v.VentasNetas) DESC
+     LIMIT 1) AS SucursalConMayorVentas
+FROM
+    Q1_2021 AS Q1
+JOIN
+    Directorio AS d ON Q1.Branch = d.Branch;	
+	-- No funciono. 
+	
+-- Last Try
+WITH SucursalMaxVentas AS (
+    SELECT
+        d.Estado,
+        Q1.Branch,
+        SUM(Q1.VentasNetas) AS TotalVentasNetas
+    FROM
+        Q1_2021 AS Q1
+    JOIN
+        Directorio d ON Q1.Branch = d.Branch
+    GROUP BY
+        d.Estado, Q1.Branch
+    ORDER BY
+        d.Estado, SUM(Q1.VentasNetas) DESC
+),
+SucursalTopPorEstado AS (
+	SELECT
+		Estado,
+		MAX(Branch) AS SucursalConMayorVentas
+	FROM
+		SucursalMaxVentas
+	GROUP BY
+		Estado
+)
+SELECT
+    Q1.IdRegistro,
+    Q1.Venta$,
+    d.Estado,
+    Q1.Branch,
+    (SELECT AVG(Q1.Venta$)
+     FROM Q1_2021 AS Q1
+     JOIN Directorio sub_d ON Q1.Branch = sub_d.Branch
+     WHERE sub_d.Estado = d.Estado) AS PromedioVentaPorEstado,
+    s.SucursalConMayorVentas
+FROM
+    Q1_2021 AS Q1
+JOIN
+    Directorio d ON Q1.Branch = d.Branch
+LEFT JOIN
+    SucursalTopPorEstado s ON d.Estado = s.Estado;
+
+
+--------------------------------------------------------------------------------------------------------------------------------------
+-- 5. Replica el ejercicio #1 (de la sección Análisis de datos) 
+-- ¿Cuántos y cuales VIN´s únicos que visitaron el taller durante el primer trimestre del año, también visitaron el taller al segundo trimestre
+	-- y agrega un campo que permita conocer su ticket promedio y el ticket promedio de la marca (según la marca de cada vin).
+
+-- Lista de Vins unicos	
+SELECT DISTINCT(Vin) FROM Q1_y_Q2_2021 WHERE QPR = 'Q1'
+INTERSECT
+SELECT DISTINCT(Vin) FROM Q1_y_Q2_2021 WHERE QPR = 'Q2'
+
+-- Numero total
+SELECT COUNT(*) AS TotalVins
+	FROM (
+		SELECT DISTINCT(Vin) FROM Q1_y_Q2_2021 WHERE QPR = 'Q1'
+		INTERSECT
+		SELECT DISTINCT(Vin) FROM Q1_y_Q2_2021 WHERE QPR = 'Q2'
+	) AS VinIntersect;
+
+SELECT 
+    Vin,
+    PromedioVentaPorVin
+FROM (
+    SELECT 
+        Vin, 
+        AVG(VentaTotal$) AS PromedioVentaPorVin
+    FROM Q1_y_Q2_2021 
+    WHERE Vin IN (
+        SELECT DISTINCT(Vin) FROM Q1_y_Q2_2021 WHERE QPR = 'Q1'
+        INTERSECT
+        SELECT DISTINCT(Vin) FROM Q1_y_Q2_2021 WHERE QPR = 'Q2'
+    )
+    GROUP BY Vin
+);
+
+
+
+
+
+
+

@@ -7,5 +7,14 @@
             "scope": "workspace"
         }
     },
-    "cSpell.language": "en,es-ES"
+    "cSpell.language": "en,es-ES",
+    "sqltools.connections": [
+        {
+            "previewLimit": 50,
+            "driver": "SQLite",
+            "name": "'database.db",
+            "database": "C:\\Users\\dashi\\Documents\\PruebaTecnica\\database.db"
+        }
+    ],
+    "sqltools.useNodeRuntime": true
 }
