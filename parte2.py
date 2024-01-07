@@ -1,5 +1,6 @@
 """
-Create Database
+Este file crea un abase de datos, y carga los csv files en la base de datos 
+después de limpiar algunas columnas
 """
 
 import sqlite3
@@ -64,5 +65,5 @@ def create_db():
 
 
 # Uncomment to make the DB for the first time. If the DB exist comment the line
-# create_db()
+create_db()
 
